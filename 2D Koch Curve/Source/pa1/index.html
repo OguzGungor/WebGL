@@ -1,0 +1,103 @@
+<html>
+    <head>
+        <title> Test</title>
+        <script id="vertex-shader" type="x-shader/x-vertex">
+            attribute vec4 vPosition;
+            attribute vec4 vColor;
+
+            varying vec4 fColor;
+
+
+            void
+            main()
+            {
+                gl_Position = vPosition;
+                fColor = vColor;
+            }
+            </script>
+            <script id="fragment-shader" type="x-shader/x-fragment">
+            
+            precision mediump float;
+
+            varying vec4 fColor;
+            void
+            main()
+            {
+                gl_FragColor = fColor;
+            }
+            </script>
+            
+            <script type="text/javascript" src="../Common/webgl-utils.js"></script>
+            <script type="text/javascript" src="../Common/initShaders.js"></script>
+            <script type="text/javascript" src="../Common/MV.js"></script>
+            <script type="text/javascript" src="test.js"></script>
+        </head>
+    <body>
+        
+        
+        <div>
+            <canvas id="gl-canvas" width="600" height="600">
+                Error text
+            </canvas>
+        </div>
+        
+        <div>
+            ---------------------------------------------------------------------------------------------
+            <br>
+            <input type="color" id="Background" name="head"
+                   value="#cccccc">
+            <label for="head">Background</label>
+        </div>
+        
+        <div>
+            <input type="color" id="Edge" name="body"
+                    value="#000000">
+            <label for="body">Edge Color</label>
+        </div>
+        <div >
+            ---------------------------------------------------------------------------------------------
+            <br>
+            -You can set background color and color of the edge to be drawn from the pickers given  below
+            <br>
+            -Color of the edge can only be set before drawing edge
+            <br>
+            ---------------------------------------------------------------------------------------------
+            
+        </div>
+      
+        <!--
+        <button id="drawSwitch">Start Drawing</button>
+        -->
+        <button id="done">Done</button>
+
+        <button id="iterate1">Iterate1</button>
+        
+        <button id="iterate2">Iterate2</button>
+        <textarea id="textin" name="textin" rows="1" cols="10"></textarea>
+        <button id="clear">Clear</button>
+
+        <button id="save">Save</button>
+        
+        <input type="file" name="inputfile"
+        id="inputfile" > 
+        <a download="info.txt" id="downloadlink" style="display: none">Download</a>
+        <div >
+            ---------------------------------------------------------------------------------------------
+            <br>
+            -When You done with the drawing, press 'done' to display polygon
+            <br>
+            -You can iterate step by step with using 'iterate' button
+            <br>
+            -You can iterate more than one step with using 'iterate2' button
+            <br>
+            -You can reset the chard by clicking 'clear' button
+            <br>
+            -You can save and load shapes with 'save' and 'browse' buttons
+            <br>
+            -You can zoom in/out by using mouse wheel when cursor is inside the chard
+            <br>
+            ---------------------------------------------------------------------------------------------
+            
+        </div>
+    </body>
+</html>

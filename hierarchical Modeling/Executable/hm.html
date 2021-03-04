@@ -1,0 +1,291 @@
+<html>
+    <head>
+      <style>
+        .grid {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr);
+            grid-template-columns: repeat(12, 1fr);
+            grid-gap: 10px;
+          }
+          .mainFrame{
+            color: white;
+            font-size: 4vw;
+            padding: 10px;
+            background: gray;
+            text-align: center;            
+            grid-column: span 12;
+          }
+          .box{                          
+            color: black;
+            font-size: 20px;
+            padding: 10px;
+            background: white;
+            text-align: center;            
+            grid-column: span 6;
+          }
+          .box2{           
+            color: white;
+            font-size: 20px;
+            padding: 10px;
+            background: gray;
+            text-align: center;            
+            grid-column: span 3;
+          }
+          .box3{           
+            color: white;
+            font-size: 20px;
+            padding: 10px;
+            background: gray;
+            text-align: center;            
+            grid-column: span 6;
+          }
+
+      </style>
+        <title> Test</title>  
+        <script id="vertex-shader" type="x-shader/x-vertex">
+          //assume both position and normal are in homogeneous form
+
+          attribute vec4 vPosition;
+          attribute vec4 vNormal;
+          //attribute  vec3 vNormal;          
+          varying vec4 fColor;
+          
+          
+          uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+          uniform mat4 modelViewMatrix;
+          uniform mat4 projectionMatrix;
+          uniform vec4 lightPosition;
+          uniform float shininess;
+                   
+          void main()
+          {
+              vec3 pos = (modelViewMatrix * vPosition).xyz;
+              vec3 L;
+              if(lightPosition.w == 0.0) L = normalize(lightPosition.xyz);
+              else L = normalize( lightPosition.xyz - pos );
+              vec3 E = -normalize( pos );
+              vec3 H = normalize( L + E );
+              vec3 N = normalize((modelViewMatrix*vNormal).xyz);
+
+             /* vec3 pos = -(modelViewMatrix * vPosition ).xyz;
+              
+              vec3 light = lightPosition.xyz;
+              vec3 L = normalize( light - pos ); 
+              vec3 E = normalize( -pos );
+              vec3 H = normalize( L + E );              
+              vec4 NN = vec4(vNormal,0);     
+              vec3 N = normalize( (modelViewMatrix*NN).xyz);*/
+
+              vec4 ambient = ambientProduct;
+              float Kd = max( dot(L, N), 0.0 );
+              vec4  diffuse = Kd*diffuseProduct;
+              float Ks = pow( max(dot(N, H), 0.0), shininess );
+              vec4  specular = Ks * specularProduct;
+              if( dot(L, N) < 0.0 ) {
+                specular = vec4(0.0, 0.0, 0.0, 1.0);
+              } 
+              gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+              fColor = ambient + diffuse +specular;
+              fColor.a = 1.0;
+          }
+            </script>
+            <script id="fragment-shader" type="x-shader/x-fragment">
+            
+            precision mediump float;
+
+            varying vec4 fColor;
+            void
+            main()
+            {
+                gl_FragColor = fColor;
+            }
+            </script>
+                    
+            <script type="text/javascript" src="../Source/Common/webgl-utils.js"></script>
+            <script type="text/javascript" src="../Source/Common/initShaders.js"></script>
+            <script type="text/javascript" src="../Source/Common/MV.js"></script>      
+            <script type="text/javascript" src="../Source/componentData.js"></script>
+            <script type="text/javascript" src="../Source/hm.js"></script>    
+    </head>
+    
+    <body>
+      <main class="grid">
+        <div class="mainFrame">
+          Spider Demo
+          <main class="grid">
+            <div class="box">
+              <canvas id="gl-canvas" width="640" height="640"  style="background: url('https://wallpaperset.com/w/full/5/8/2/57423.jpg')">
+                Error in displaying canvas
+              </canvas>
+            </div>
+            <div class="box">
+              <main class="grid">
+                <div class="box2">                      
+                  <label>Change position of spider <br> X: </label>
+                  <input type="range" min="-6000" max="3000" value="0" id="x">
+                  <br>
+                  <label> Y: </label>
+                  <input type="range" min="-5425" max="6786" value="0" id="y">
+                  <br>
+                  <label> Z:</label>
+                  <input type="range" min="-6" max="6" value="0" id="z">
+                  <br>
+                </div>
+                <div class="box2">
+                  <br>
+                  <label>Rotate Spider along <br> X: </label>
+                  <input type="range" min="-135" max="225" value="45" id="torso-x">
+                  <br>
+                  <label>Y: </label>
+                  <input type="range" min="-135" max="225" value="45" id="torso-y">
+                  <br>
+                  <label>Z:</label>
+                  <input type="range" min="-180" max="180" value="0" id="torso-z">
+                </div>
+                <div class="box2">                  
+                  <label>Rotate Neck <br> up/down </label>
+                  <input type="range" min="30" max="60" value="45" id="neck-x">
+                  <br>
+                  <label> left/right </label>
+                  <input type="range" min=-25 max="25" value="0" id="neck-y">
+                </div>
+                <div class="box2">                      
+                  <label>Rotate Head <br> up/down </label>
+                  <input type="range" min="30" max="60" value="45" id="head-x">
+                </div>
+                <div class="box2">
+                  <label>Rotate right front leg for <br>X: </label>
+                  <input type="range" min="-10" max="10" value="0" id="upper-right-front-x">
+                  <br>
+                  <label> Y: </label>
+                  <input type="range" min=15 max="65" value="30" id="upper-right-front-y">
+                  <br>
+                  <label> Z: </label>
+                  <input type="range" min="20" max="65" value="45" id="upper-right-front-z">
+                </div>
+                <div class="box2">                  
+                  <label>Rotate right middle leg for <br> X: </label>
+                  <input type="range" min="-10" max="10" value="0" id="upper-right-middle-x">
+                  <br>
+                  <label>Y: </label>
+                  <input type="range" min="-10" max="10" value="0" id="upper-right-middle-y">
+                  <br>
+                  <label> Z: </label>
+                  <input type="range" min="20" max="65" value="45" id="upper-right-middle-z">
+                </div>
+                <div class="box2">                  
+                  <label>Rotate right back leg for <br> X: </label>
+                  <input type="range" min="-10" max="10" value="0" id="upper-right-back-x">
+                  <br>
+                  <label> Y: </label>
+                  <input type="range" min=15 max="65" value="30" id="upper-right-back-y">
+                  <br>
+                  <label>Z: </label>
+                  <input type="range" min="20" max="65" value="45" id="upper-right-back-z">
+                </div>
+                <div class="box2">
+                  <label>Rotate left front leg for <br> X: </label>
+                  <input type="range" min="-10" max="10" value="0" id="upper-left-front-x">
+                  <br>
+                  <label> Y: </label>
+                  <input type="range" min=15 max="65" value="30" id="upper-left-front-y">
+                  <br>
+                  <label> Z: </label>
+                  <input type="range" min="20" max="65" value="45" id="upper-left-front-z">
+                </div>
+                <div class="box2">                  
+                  <label>Rotate left middle leg for<br> X: </label>
+                  <input type="range" min="-10" max="10" value="0" id="upper-left-middle-x">
+                  <br>
+                  <label> Y: </label>
+                  <input type="range" min="-10" max="10" value="0" id="upper-left-middle-y">
+                  <br>
+                  <label> Z: </label>
+                  <input type="range" min="20" max="65" value="45" id="upper-left-middle-z">
+                </div>
+                <div class="box2">                  
+                  <label>Rotate left back leg for <br> X: </label>
+                  <input type="range" min="-10" max="10" value="0" id="upper-left-back-x">
+                  <br>
+                  <label> Y: </label>
+                  <input type="range" min=10 max="65" value="30" id="upper-left-back-y">
+                  <br>
+                  <label> Z: </label>
+                  <input type="range" min="20" max="65" value="45" id="upper-left-back-z">
+                </div>
+                <div class="box2">
+                  <label>Move right front lower leg: </label>
+                  <br>
+                  <input type="range" min="45" max="118" value="90" id="lower-right-front">
+                </div>
+                <div class="box2">
+                  
+                  <label>Move right middle lower leg: </label><br>
+                  <input type="range" min="45" max="118" value="90" id="lower-right-middle">
+                </div>
+                <div class="box2">                  
+                  <label>Move right back lower leg: </label><br>
+                  <input type="range" min="45" max="118" value="90" id="lower-right-back">
+                </div>
+                <div class="box2">                  
+                  <label>Move left front lower leg: </label><br>
+                  <input type="range" min="45" max="118" value="90" id="lower-left-front">
+                </div>
+                <div class="box2">                  
+                  <label>Move left middle lower leg: </label><br>
+                  <input type="range" min="45" max="118" value="90" id="lower-left-middle">
+                </div>
+                <div class="box2">                  
+                  <label>Move left back lower leg: </label><br>
+                  <input type="range" min="45" max="118" value="90" id="lower-left-back">
+                </div>
+                <div class="box2">   
+                  <br>            
+                  <button id="reset">Reset Configurations</button>
+                  <br>
+                  <br> 
+                  <button id="save-config">Save Configurations</button>
+                </div>
+                <div class="box2">
+                  <br>
+                  <button id="save-step">Save Step</button>  
+                  <br>
+                  <br>  
+                  <input class="hidden" type="file" id="load">                 
+                  <br>
+                  <br> 
+                  <button id="save-anim">Save Animation</button>  
+                </div>
+                <div class="box3">   
+                  <br>                 
+                  <button id="animate">Animate</button>
+                  <br>
+                  <br>
+                  <label> Animation speed: </label>
+                  <input type="range" min="-100" max="-20" value="-20" id="speed">
+                  
+                  <br>
+                  <br>
+                  <label> interpolationFactor: </label>
+                  <input type="range" min="1" max="10" value="1" id="interpolationFactor">
+                </div>
+                <div class="box2">
+                  <label>light Source </label><br>
+                  X:
+                  <input type="range" min="-10" max="10" value="5" id="light-x"> <br> 
+                  Y:                 
+                  <input type="range" min="-10" max="10" value="5" id="light-y"> <br>
+                  Z:                  
+                  <input type="range" min="-10" max="10" value="4" id="light-z"> 
+                </div>
+                
+              </main>
+            </div>
+          </main>          
+        </div>
+
+      </main>
+             
+
+    </body>
+</html>
